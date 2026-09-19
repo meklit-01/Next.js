@@ -1,8 +1,13 @@
+
 import CategoryBar from "./catagoryBar";
 import DishList from "./DishList";
 import MenuButton from "./MenuButton";
 
-export default function Menu(){
+export default async function Menu(){
+
+    // throw new Error("error"); testing menu error
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     return(
         <div>
             <h1>Menu</h1>
