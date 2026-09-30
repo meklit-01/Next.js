@@ -1,41 +1,43 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+export async function cancelOrder(orderId) {
+  // 1. Get the current session.
+  const session = await getSession();
 
-export async function createOrder(previousState, formData) {
-  const name = formData.get("name");
-  const phone = formData.get("phone");
-  const area = formData.get("area");
-  const notes = formData.get("notes");
-
-  const fieldErrors = {};
-
-  if (!name || name.trim() === "") {
-    fieldErrors.name = "Name is required.";
-  }
-
-  if (!phone || phone.trim() === "") {
-    fieldErrors.phone = "Phone number is required.";
-  }
-
-  if (!["Bole", "Kazanchis", "Megenagna", "Piassa"].includes(area)) {
-    fieldErrors.area = "Please select a valid area.";
-  }
-
-  if (Object.keys(fieldErrors).length > 0) {
+  // 2. Make sure the user is logged in.
+  if (!session) {
     return {
       success: false,
-      fieldErrors,
+      error: "You must be logged in.",
     };
   }
 
-  // Save the order here.
+  // 3. Find the order.
+  const order = await getOrder(orderId);
 
-  revalidatePath("/checkout");
+  // 4. Check that the order exists.
+  if (!order) {
+    return {
+      success: false,
+      error: "Order not found.",
+    };
+  }
+
+  // 5. Check that the logged-in user owns the order.
+  if (order.userId !== session.user.id) {
+    return {
+      success: false,
+      error: "You are not allowed to cancel this order.",
+    };
+  }
+
+  // 6. Only now modify the database.
+  await updateOrder(orderId, {
+    status: "cancelled",
+  });
 
   return {
     success: true,
-    message: "Order created successfully!",
-    fieldErrors: {},
+    message: "Order cancelled.",
   };
 }
