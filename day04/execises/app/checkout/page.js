@@ -2,6 +2,7 @@
 
 
 import { useState } from "react";
+import { CreateOrder } from "./actions";
 export default function checkOut(){
      const [form, setForm] = useState({
         name:"",
@@ -18,15 +19,6 @@ export default function checkOut(){
         event.preventDefault();
         setErrors({});
         setMessage("");
-
-        const response = await fetch("/api/orders", {
-            method:"POST",
-            headers: {
-                "content-Type": "appliction/json",
-            },
-
-            body:JSON.stringify(form),
-        });
 
         const data = await response.json();
 
@@ -52,7 +44,7 @@ export default function checkOut(){
         <main>
             <h1>CheckOut</h1>
 
-            <form onSubmit={handleSubmit}>
+            <form action={CreateOrder}>
                 <input name="name" placeholder="Name" value={form.name}
                 onChange={handleChange}/>
                 {errors.name && <p>{errors.name}</p>}
