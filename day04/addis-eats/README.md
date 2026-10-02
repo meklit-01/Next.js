@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Addis Eats API
 
-## Getting Started
+## API Endpoints
 
-First, run the development server:
+### GET `/api/dishes`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Returns all dishes.
+
+**Success:**
+
+* `200` — dishes returned successfully
+
+**Error:**
+
+* `500` — failed to load dishes
+
+---
+
+### GET `/api/dishes/[id]`
+
+Returns one dish by its ID.
+
+**Success:**
+
+* `200` — dish found
+
+**Errors:**
+
+* `404` — dish not found
+* `500` — failed to load dish
+
+Example:
+
+```text
+GET /api/dishes/1
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### POST `/api/orders`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Creates a new order.
 
-## Learn More
+**Success:**
 
-To learn more about Next.js, take a look at the following resources:
+* `201` — order created successfully
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Errors:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* `422` — validation errors
+* `400` — invalid request
 
-## Deploy on Vercel
+Example request:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```json
+{
+  "name": "Meklit",
+  "phone": "0912345678",
+  "area": "Bole",
+  "notes": "Please call when you arrive"
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Validation errors are returned using `fieldErrors`.
+
+Example:
+
+```json
+{
+  "fieldErrors": {
+    "phone": "Phone must be 10 digits and start with 09."
+  }
+}
+```
+
+## Server Actions
+
+### `placeOrder`
+
+The checkout form uses the `placeOrder` Server Action instead of sending the order with `fetch`.
+
+It:
+
+* validates the form
+* creates the order
+* uses `useActionState`
+* displays field errors
+* displays a pending state
+* revalidates the orders page after a successful order
+
+### `cancelOrder`
+
+The `cancelOrder` Server Action checks:
+
+1. A session exists.
+2. The order exists.
+3. The order belongs to the current session.
+
+An unauthorized user cannot cancel another user's order by simply calling the action from the browser.
+
+## Environment Variables
+
+Server secrets are stored in `.env.local`.
+
+`.env.local` is ignored by Git using:
+
+```text
+.env*
+```
+
+Secrets are not exposed through `NEXT_PUBLIC_` environment variables or client-side code.
