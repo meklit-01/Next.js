@@ -6,7 +6,10 @@ import fetcher from "@/lib/fetcher";
 export default function OrderStatus(){
     const { data , error, isLoading } = useSWR(
         "/api/orders",
-        fetcher
+        fetcher,
+        {
+            refreshInterval: 3000,
+        }
     );
 
     if (isLoading) return <p>Loading...</p>;
