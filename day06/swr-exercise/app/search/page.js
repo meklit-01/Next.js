@@ -5,35 +5,41 @@ import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
 
 export default function SearchPage() {
-    const [search, setSearch] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    useEffect(()=>{
-        const timer = setTimeout(()=>{
-            setDebouncedSearch(search);
-            
-        }, 500);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
 
-        return () => clearTimeout(timer);
-    }, [search]);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-    const { data, isLoading } = useSWR(Key, fetcher);
+  const key = debouncedSearch
+    ? `/api/search?q=${debouncedSearch}`
+    : null;
 
-    return(
-        <div>
-            <h1>Search</h1>
+  const { data, isLoading } = useSWR(key, fetcher, {
+    keepPreviousData: true,
+  });
 
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e)=> setSearch(e.target.value)}/>
+  return (
+    <div>
+      <h1>Search</h1>
 
-            {isLoading && <p>serching...</p>}
+      <input
+        type="text"
+        placeholder="Search..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-            {data?.results.map((result)=>(
-                <p key={result}>{result}</p>
-            ))}
-        </div>
-    );
+      {isLoading && <p>Searching...</p>}
+
+      {data?.results.map((result) => (
+        <p key={result}>{result}</p>
+      ))}
+    </div>
+  );
 }

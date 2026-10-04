@@ -1,10 +1,10 @@
-import { json } from "express";
 
-export default function GET(request){
+
+export async function GET(request){
     const { searchParams } = new URL(request.url);
-    const q = searchParamsget("q") || "";
+    const q = searchParams.get("q") || "";
 
-    return Response,json(
+    return Response.json(
         {
             results: q
         ? [`Result for "${q}`]
