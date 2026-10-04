@@ -1,25 +1,14 @@
 "use client"
 
-import useSWR from "swr";
-import fetcher from "@/lib/fetcher";
-
-export default function OrderStatus(){
-    const { data , error, isLoading } = useSWR(
-        "/api/orders",
-        fetcher,
-        {
-            refreshInterval: 3000,
-        }
-    );
-
-    if (isLoading) return <p>Loading...</p>;
-    if (error) return <p>Error loading order</p>;
-
+import OrderStatus from "./orderStatus";
+export default async function Page() {
+  const order = {
+    id: 1,
+    status: "Preparing",
+  };
     return(
         <div>
-            <h1>Order Status</h1>
-            <p>order #{data.id}</p>
-            <p>Status: {data.status}</p>
+         <OrderStatus order={order}/>
         </div>
     );
 }
