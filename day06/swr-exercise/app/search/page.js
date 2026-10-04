@@ -7,6 +7,7 @@ import fetcher from "@/lib/fetcher";
 export default function SearchPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -17,7 +18,7 @@ export default function SearchPage() {
   }, [search]);
 
   const key = debouncedSearch
-    ? `/api/search?q=${debouncedSearch}`
+    ? `/api/search?q=${encodeURIComponent(debouncedSearch)}&page=${page}`
     : null;
 
   const { data, isLoading } = useSWR(key, fetcher, {
@@ -40,6 +41,15 @@ export default function SearchPage() {
       {data?.results.map((result) => (
         <p key={result}>{result}</p>
       ))}
+      <div>
+        <button
+         onClick={()=> setPage(page - 1)}>
+            previous
+         </button>
+         <span>Page {page}</span>
+
+         <button onClick={()=> setPage(page +1)}>Next</button>
+      </div>
     </div>
   );
 }
