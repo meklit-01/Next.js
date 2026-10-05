@@ -46,6 +46,12 @@ input {
   padding: 8px;
 }
 
+.pages{
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
 footer {
   margin-top: 30px;
   padding-top: 20px;
