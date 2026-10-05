@@ -5,17 +5,19 @@ export async function getSession() {
 
   const session = cookieStore.get("session")?.value;
 
-  if (!session) {
-    return null;
+  if (session === "user-123") {
+    return {
+      id: "user-123",
+      role: "user",
+    };
   }
 
-  
-  if (session !== "user-123") {
-    return null;
+  if (session === "staff-123") {
+    return {
+      id: "staff-123",
+      role: "staff",
+    };
   }
 
-  return {
-    id: session,
-    role: "user",
-  };
+  return null;
 }
