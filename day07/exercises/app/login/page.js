@@ -6,14 +6,19 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const next = searchParams.get("next") || "/";
+  const next = searchParams.get("next");
+
+  const safeNext =
+    next && next.startsWith("/") && !next.startsWith("//")
+      ? next
+      : "/";
 
   async function handleLogin() {
     await fetch("/api/login", {
       method: "POST",
     });
 
-    router.push(next);
+    router.push(safeNext);
   }
 
   return (
