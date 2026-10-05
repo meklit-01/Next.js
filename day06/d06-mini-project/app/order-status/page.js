@@ -4,5 +4,5 @@ import OrderStatus from "./OrderStatus";
 export default function OrderStatusPage() {
   const orders = getOrders();
 
-  return <div > <OrderStatus initialOrders={orders} /></div>
+  return (<div > <OrderStatus initialOrders={orders} /></div>);
 }

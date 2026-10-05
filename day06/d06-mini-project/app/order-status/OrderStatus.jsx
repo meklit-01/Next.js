@@ -12,6 +12,10 @@ export default function OrderStatus({ initialOrder }){
             refreshInterval: 5000,
          }
     );
+
+    // if (isLoading) {
+    //     return <p>Loading...</p>; 
+    //    }  
     if (error){
         return <p>Failed to load orders.</p>
     }
@@ -20,7 +24,7 @@ export default function OrderStatus({ initialOrder }){
         <div>
             <h1>Order Status</h1>
 
-            {data.length === 0 ?(<p>No orders yet.</p>) : (
+            {!data || data.length === 0 ? (<p>No orders yet.</p>) : (
                 data.map((order) => (
                     <div key={order.id}>
                         <h2>Order #{order.id}</h2>
