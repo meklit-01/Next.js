@@ -2,10 +2,12 @@ import  Link  from "next/link";
 import { getDishes } from "../../lib/dishes";
 import DishList from "./DishList";
 import FilterShell from "./FilterShell";
+import PageMenu from "./PageMenu";
 
 export const revalidate = 60;
 
 export default async function MenuPage({ searchParams }) {
+
   const params = await searchParams;
   const page = Number(params.page) || 1;
  
@@ -19,30 +21,22 @@ export default async function MenuPage({ searchParams }) {
   const totalPages = Math.ceil(
     allDishes.length / limit
   );
-
+ const initialData ={
+  dishes,
+  page,
+  totalPages,
+ }
 
   return (
     <div>
       <h1>Our Menu</h1>
 
       <FilterShell>
-        <DishList dishes={dishes} />
+        <PageMenu
+          initialData={initialData}
+          page={page}
+          />
       </FilterShell>
-
-      <div className=" pages">
-        {page > 1 && (
-          <Link href={`/menu?page=${page -1}`}> Previous 
-          </Link> 
-      )}
-        <span>
-           page {page} of {totalPages} 
-        </span>
-        {page < totalPages && (
-          <Link href={`/menu?page=${page +1}`}>
-            Next
-          </Link>
-        )}
-      </div>
     </div>
   );
 }
