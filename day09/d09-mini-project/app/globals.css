@@ -1,0 +1,84 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-geist), Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  line-height: 1.5;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+main {
+  padding: 30px 0;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.dish-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.dish-grid article {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.dish-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pages {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  display: block;
+  margin: 8px 0 16px;
+  padding: 8px;
+  width: min(100%, 420px);
+}
+
+footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
