@@ -8,26 +8,37 @@ export function createOrder(data, userId) {
     area: data.area,
     notes: data.notes || "",
     userId,
+    status: "processing",
     createdAt: new Date().toISOString(),
   };
 
   orders.push(order);
-
   return order;
 }
 
-export function getOrders() {
+export function getOrdersByUserId(userId) {
+  return orders.filter((order) => order.userId === userId);
+}
+
+export function getOrderByIdForUser(id, userId) {
+  return orders.find(
+    (order) =>
+      String(order.id) === String(id) &&
+      order.userId === userId
+  );
+}
+
+export function getAllOrders() {
   return orders;
 }
 
-export function getOrderById(id) {
-  return orders.find(
-    (order) => String(order.id) === String(id)
-  );
-}
+export function deleteOrder(id, userId) {
+  const order = getOrderByIdForUser(id, userId);
 
-export function deleteOrder(id) {
-  orders = orders.filter(
-    (order) => String(order.id) !== String(id)
-  );
+  if (!order) {
+    return false;
+  }
+
+  orders = orders.filter((item) => item.id !== order.id);
+  return true;
 }

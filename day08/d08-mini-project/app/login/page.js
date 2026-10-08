@@ -6,24 +6,17 @@ import { useSearchParams } from "next/navigation";
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/orders";
-
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
-
     setError("");
 
     const response = await fetch("/api/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        next,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, next }),
     });
 
     const data = await response.json();
@@ -38,24 +31,19 @@ export default function LoginPage() {
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Sign in</h1>
+      <p>Use alice, bob, or staff for the demo accounts.</p>
 
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username</label>
-
-          <input
-            type="text"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            placeholder="Enter username"
-            required
-          />
-        </div>
-
-        <button type="submit">
-          Sign in
-        </button>
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          required
+        />
+        <button type="submit">Sign in</button>
       </form>
 
       {error && <p>{error}</p>}

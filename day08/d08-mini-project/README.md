@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Addis Eats
 
-## Getting Started
+Next.js App Router mini-project covering live data, authentication, performance, and findability.
 
-First, run the development server:
+## Setup
+
+```bash
+npm install
+```
+
+Copy `.env.example` to `.env.local` and set:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://your-production-domain.example
+SESSION_SECRET=use-a-long-random-secret
+```
+
+Start development:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For the performance measurement:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm run start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Demo accounts
 
-## Learn More
+- `alice` — normal user
+- `bob` — different normal user
+- `staff` — staff-only kitchen access
 
-To learn more about Next.js, take a look at the following resources:
+## Live-data network behavior
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The search box waits 500 ms after typing stops before changing its SWR key. Therefore typing five characters does not fire five search requests; it produces one request after the debounce period.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+An empty search uses a `null` SWR key, so it does not request `/api/search`.
 
-## Deploy on Vercel
+The menu page puts the page number in the URL, for example `/menu?page=2`, so a page can be bookmarked and shared. The server supplies the initial page as `fallbackData`, and SWR uses `keepPreviousData` so the old list remains visible while the next page loads.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Order Status is server-rendered first and then polls `/api/orders` every five seconds. The server data is passed as `fallbackData`, so there is no first-paint spinner.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+SWR's shared cache and five-second deduplication window mean two components requesting the same key can reuse the same cached request/result.
+
+## Security notes
+
+See `AUTH.md` for protected routes, session handling, ownership checks, the staff-only route, and the three required attack tests.
+
+## Performance notes
+
+See `PERF.md` for the production Lighthouse before/after record.
+
+## Findability
+
+The app includes route metadata, absolute Open Graph metadata through `metadataBase`, generated dish Open Graph images at 1200×630, MenuItem JSON-LD, and a sitemap generated from `public/dishes.json`.
+
+Private routes are intentionally absent from the sitemap.

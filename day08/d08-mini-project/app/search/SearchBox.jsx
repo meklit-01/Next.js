@@ -1,51 +1,58 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useSwR from "swr";
+import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 
 export default function SearchBox() {
-    const [search, setSearch ] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    useEffect(()=>{
-        const timer = setTimeout(()=>{
-            setDebouncedSearch(search);
-        }, 500);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const term = search.trim();
+      setDebouncedSearch(term);
+    }, 500);
 
-        return () => clearTimeout(timer)
-    }, [search]);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-    const key = debouncedSearch
+  const key = debouncedSearch
     ? `/api/search?q=${encodeURIComponent(debouncedSearch)}`
     : null;
 
-    const { data, error, isLoading } = useSwR(
-        key,
-        fetcher,
-        {
-            keepPreviousData: true,
-        }
-    );
-    return(
-        <div>
-            <h1>Serch Menu</h1>
+  const { data = [], error, isValidating } = useSWR(key, fetcher, {
+    keepPreviousData: true,
+    dedupingInterval: 500,
+    revalidateOnFocus: false,
+  });
 
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}/>
+  return (
+    <div>
+      <h1>Search Menu</h1>
 
-              {error && <p>Failed to search.</p>}
-              {isLoading && <p>serching...</p>}
-              {data && data.lengh === 0 && (<p>No dishes found.</p>)}
+      <label htmlFor="menu-search">Search dishes</label>
+      <input
+        id="menu-search"
+        type="search"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="Try kitfo"
+      />
 
-              {data?.map((dish)=>(
-                <div key={dish.id}>
-                  <h2>{dish.name}</h2>
-                  <p>{dish.price} ETB</p>
-                  </div>
-              ))}
+      {error && <p>Failed to search.</p>}
+      {isValidating && debouncedSearch && <p>Updating results...</p>}
+
+      {debouncedSearch && data.length === 0 && !error ? (
+        <p>No dishes found.</p>
+      ) : null}
+
+      {data.map((dish) => (
+        <div key={dish.id}>
+          <h2>{dish.name}</h2>
+          <p>{dish.price} ETB</p>
         </div>
-    );
+      ))}
+    </div>
+  );
 }

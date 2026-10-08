@@ -1,43 +1,48 @@
 "use client";
 
-import useSWR from "swr";
 import Link from "next/link";
+import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import DishList from "./DishList";
 
-export default function PagedMenu({ initialData, page }) {
-  const key = `/api/dishes?page=${page}`;
+export default function PageMenu({ initialData }) {
+  const key = `/api/dishes?page=${initialData.page}`;
 
-  const { data, error } = useSWR(key, fetcher, {
-    fallbackData: initialData,
-    keepPreviousData: true,
-  });
-
-  if (error) {
-    return <p>Failed to load dishes.</p>;
-  }
+  const { data = initialData, error, isValidating } = useSWR(
+    key,
+    fetcher,
+    {
+      fallbackData: initialData,
+      keepPreviousData: true,
+      dedupingInterval: 5000,
+      revalidateOnFocus: false,
+    }
+  );
 
   return (
     <div>
+      {error && <p>Could not refresh the menu.</p>}
+      {isValidating && <p>Updating menu...</p>}
+
       <DishList dishes={data.dishes} />
 
-      <div>
-        {page > 1 && (
-          <Link href={`/menu?page=${page - 1}`}>
+      <nav aria-label="Menu pages" className="pages">
+        {data.page > 1 && (
+          <Link href={`/menu?page=${data.page - 1}`}>
             Previous
           </Link>
         )}
 
         <span>
-          {" "} Page {page} of {data.totalPages} {" "}
+          Page {data.page} of {data.totalPages}
         </span>
 
-        {page < data.totalPages && (
-          <Link href={`/menu?page=${page + 1}`}>
+        {data.page < data.totalPages && (
+          <Link href={`/menu?page=${data.page + 1}`}>
             Next
           </Link>
         )}
-      </div>
+      </nav>
     </div>
   );
 }

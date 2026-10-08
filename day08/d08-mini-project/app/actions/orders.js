@@ -1,17 +1,25 @@
-
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-
+import { getSession } from "@/lib/session";
 import { validateOrder } from "@/lib/schema";
 import {
   createOrder,
-  getOrderById,
   deleteOrder,
+  getOrderByIdForUser,
 } from "@/lib/orders";
 
 export async function placeOrder(previousState, formData) {
+  const session = await getSession();
+
+  if (!session) {
+    return {
+      success: false,
+      message: "You must be signed in before placing an order.",
+      fieldErrors: {},
+    };
+  }
+
   const name = formData.get("name")?.trim();
   const phone = formData.get("phone")?.trim();
   const area = formData.get("area")?.trim();
@@ -27,73 +35,53 @@ export async function placeOrder(previousState, formData) {
   if (!validation.success) {
     return {
       success: false,
+      message: "",
       fieldErrors: validation.fieldErrors,
     };
   }
 
-  const cookieStore = await cookies();
-
-  let sessionId = cookieStore.get("session")?.value;
-
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-
-    cookieStore.set("session", sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-  }
-
-  const order = createOrder({
-    name,
-    phone,
-    area,
-    notes,
-    userId: sessionId,
-  });
+  const order = createOrder(
+    { name, phone, area, notes },
+    session.id
+  );
 
   revalidatePath("/orders");
+  revalidatePath("/order-status");
 
   return {
     success: true,
+    message: "Order placed successfully.",
     order,
     fieldErrors: {},
   };
 }
 
 export async function cancelOrder(orderId) {
-  const cookieStore = await cookies();
+  const session = await getSession();
 
-  const sessionId = cookieStore.get("session")?.value;
-
-  if (!sessionId) {
+  if (!session) {
     return {
-      error: "You must be signed in.",
+      success: false,
+      message: "You must be signed in.",
     };
   }
 
-  const order = getOrderById(orderId);
+  const order = getOrderByIdForUser(orderId, session.id);
 
   if (!order) {
     return {
-      error: "Order not found.",
+      success: false,
+      message: "Order not found or you do not own this order.",
     };
   }
 
-  if (order.userId !== sessionId) {
-    return {
-      error: "You are not allowed to cancel this order.",
-    };
-  }
-
-  deleteOrder(orderId);
+  deleteOrder(orderId, session.id);
 
   revalidatePath("/orders");
+  revalidatePath("/order-status");
 
   return {
     success: true,
+    message: "Order cancelled.",
   };
 }
-

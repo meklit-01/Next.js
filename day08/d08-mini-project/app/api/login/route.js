@@ -1,60 +1,55 @@
 import { cookies } from "next/headers";
+import {
+  getSessionCookieOptions,
+  makeSession,
+} from "@/lib/session";
 
-function isSafeNext(next) {
-  if (!next) {
+function safeNext(value) {
+  if (
+    typeof value !== "string" ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\")
+  ) {
     return "/orders";
   }
 
-  // Only allow internal paths.
-  if (!next.startsWith("/") || next.startsWith("//")) {
-    return "/orders";
-  }
-
-  return next;
+  return value;
 }
 
 export async function POST(request) {
   const body = await request.json();
-
-  const username = body.username?.trim();
-  const next = isSafeNext(body.next);
+  const username = body.username?.trim().toLowerCase();
 
   if (!username) {
     return Response.json(
-      {
-        error: "Username is required.",
-      },
-      {
-        status: 400,
-      }
+      { error: "Username is required." },
+      { status: 400 }
     );
   }
 
-  let session;
+  let id = "user-123";
+  let role = "user";
 
-  if (username === "staff") {
-    session = {
-      id: "staff-123",
-      role: "staff",
-    };
-  } else {
-    session = {
-      id: "user-123",
-      role: "user",
-    };
+  if (username === "alice") {
+    id = "user-alice";
+  } else if (username === "bob") {
+    id = "user-bob";
+  } else if (username === "staff") {
+    id = "staff-123";
+    role = "staff";
   }
 
   const cookieStore = await cookies();
 
-  cookieStore.set("session", session.id, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-  });
+  cookieStore.set(
+    "session",
+    makeSession(id, role),
+    getSessionCookieOptions()
+  );
 
   return Response.json({
     success: true,
-    redirect: next,
+    redirect: safeNext(body.next),
   });
 }
