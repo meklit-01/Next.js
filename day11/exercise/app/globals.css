@@ -1,0 +1,44 @@
+
+.map-placeholder {
+  height: 350px;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background: #eeeeee;
+  border-radius: 8px;
+}
+
+.order-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.order-page section {
+  margin-bottom: 28px;
+}
+
+.order-page h1 {
+  margin-bottom: 24px;
+}
+
+.order-page h2 {
+  margin-bottom: 12px;
+}
+
+.order-page p {
+  margin-bottom: 8px;
+}
+
+.order-page button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #4968a8;
+  color: white;
+  cursor: pointer;
+}
+
+.order-page button:hover {
+  opacity: 0.9;
+}
