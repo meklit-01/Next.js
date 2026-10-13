@@ -1,32 +1,27 @@
-import DeliveryMapLoader from "./DeliveryMapLoader";
-import StatusStream from "./StatusStream";
-import { etb, when } from "@/lib/format";
 
+import Link from "next/link";
 
-export default async function OrderPage({ params }) {
-  const { id } = await params;
-
-  // Demo order data. Replace with your database lookup.
-  const order = {
-    id,
-    total: 750,
-    createdAt: "2026-10-12T12:00:00Z",
-    status: "preparing",
-  };
+export default function OrdersPage() {
+  const orders = [
+    { id: "1", customer: "Abebe Kebede", dish: "Doro Wet" },
+    { id: "2", customer: "Sara", dish: "Shiro" },
+  ];
 
   return (
-    <main>
-      <h1>Order #{order.id}</h1>
-      <p>Total: {etb(order.total)}</p>
-      <p>Placed: {when(order.createdAt)}</p>
+    <main className="order-page">
+      <h1>My Orders</h1>
 
-      <StatusStream
-        orderId={order.id}
-        initialStatus={order.status}
-      />
+      {orders.map((order) => (
+        <section className="order-card" key={order.id}>
+          <h2>Order #{order.id}</h2>
+          <p>Customer: {order.customer}</p>
+          <p>Dish: {order.dish}</p>
 
-      <DeliveryMapLoader />
-      
+          <Link href={`/orders/${order.id}`}>
+            Track this order
+          </Link>
+        </section>
+      ))}
     </main>
   );
 }

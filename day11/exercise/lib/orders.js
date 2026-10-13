@@ -1,26 +1,23 @@
+export function relative(date) {
+  const seconds = Math.round(
+    (new Date(date).getTime() - Date.now()) / 1000
+  );
 
-const orders = [
-  {
-    id: "201",
-    customer: "Mimi, Bekele",
-    status: "preparing",
-    total: 250,
-    createdAt: "2026-10-12T12:00:00Z",
-  },
-  {
-    id: "202",
-    customer: 'Dawit "DJ" Tadesse',
-    status: "on_the_way",
-    total: 350,
-    createdAt: "2026-10-12T13:00:00Z",
-  },
-  {
-    id: "203",
-    customer: "Sara Alemu",
-    status: "delivered",
-    total: 500,
-    createdAt: "2026-10-12T14:00:00Z",
-  },
-];
+  const formatter = new Intl.RelativeTimeFormat("en", {
+    numeric: "auto",
+  });
 
-export default orders;
+  if (Math.abs(seconds) < 60) {
+    return formatter.format(seconds, "second");
+  }
+
+  if (Math.abs(seconds) < 3600) {
+    return formatter.format(Math.round(seconds / 60), "minute");
+  }
+
+  if (Math.abs(seconds) < 86400) {
+    return formatter.format(Math.round(seconds / 3600), "hour");
+  }
+
+  return formatter.format(Math.round(seconds / 86400), "day");
+}

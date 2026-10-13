@@ -1,42 +1,71 @@
-
-import orders from "@/lib/orders";
+import Link from "next/link";
+import OrderStatus from "../orderStatus";
+import MapLoader from "../MapLoader";
+import ExportButton from "../ExportButton";
 import { etb, when } from "@/lib/format";
-import OrdersCsvExport from "../OrdersCsvExport";
-import StatusStream from "./StatusStream";
-import DeliveryMapLoader from "./DeliveryMapLoader";
-import { notFound } from "next/navigation";
 
 export default async function OrderPage({ params }) {
   const { id } = await params;
-  const order = orders.find((item) => item.id === id);
 
-  if (!order) {
-    notFound();
-  }
+  // Example data. Replace with your real order lookup.
+  const order = {
+    id,
+    customer: "Abebe Kebede",
+    dish: "Doro Wet",
+    price: 250,
+    status: "Preparing",
+    createdAt: "2026-10-13T12:00:00Z",
+  };
+
+  const ordersForExport = [
+    {
+      id: order.id,
+      customer: order.customer,
+      dish: order.dish,
+      price: order.price,
+      status: order.status,
+    },
+  ];
 
   return (
     <main className="order-page">
-      <h1>Order #{order.id}</h1>
+      <Link href="/orders">← All orders</Link>
 
-      <section>
-        <h2>Order details</h2>
-        <p>Customer: {order.customer}</p>
-        <p>Total: {etb(order.total)}</p>
-        <p>Order date: {when(order.createdAt)}</p>
+      <h1>Track Your Order</h1>
+
+      <section className="order-card">
+        <h2>Order Information</h2>
+
+        <p><strong>Order ID:</strong> {order.id}</p>
+        <p><strong>Customer:</strong> {order.customer}</p>
+        <p><strong>Dish:</strong> {order.dish}</p>
+        <p><strong>Price:</strong> {etb(order.price)}</p>
+        <p><strong>Order date:</strong> {when(order.createdAt)}</p>
+       
       </section>
 
-      <StatusStream
-        orderId={order.id}
-        initialStatus={order.status}
-        initialUpdatedAt={order.createdAt}
-      />
+      <section className="order-card">
+        <h2>Live Order Status</h2>
 
-      <DeliveryMapLoader />
+        <OrderStatus
+          orderId={id}
+          initialStatus={order.status}
+          createdAt={order.createdAt}
+        />
+      </section>
 
-      <section>
-        <h2>All orders</h2>
-        <p>Export the sample orders to a CSV file.</p>
-        <OrdersCsvExport orders={orders} />
+      <section className="order-card">
+        <h2>Delivery Map</h2>
+
+        <p>Courier coordinates: 9.03, 38.74</p>
+        <p>Delivery coordinates: 9.04, 38.75</p>
+
+        <MapLoader />
+      </section>
+
+      <section className="order-card">
+        <h2>Export Orders</h2>
+        <ExportButton orders={ordersForExport} />
       </section>
     </main>
   );
